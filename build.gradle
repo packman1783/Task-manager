@@ -1,11 +1,16 @@
 plugins {
-	id 'java'
+	id 'application'
+	id 'checkstyle'
 	id 'org.springframework.boot' version '3.3.0'
 	id 'io.spring.dependency-management' version '1.1.5'
 }
 
 group = 'hexlet.code'
 version = '0.0.1-SNAPSHOT'
+
+application {
+	mainClass.set("hexlet.code.AppApplication")
+}
 
 java {
 	toolchain {
@@ -19,7 +24,12 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-devtools'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'net.javacrumbs.json-unit:json-unit-assertj:3.2.2'
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
