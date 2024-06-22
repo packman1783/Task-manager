@@ -1,9 +1,9 @@
-package hexlet.code.controller;
+package hexlet.code.controller.api;
 
-import hexlet.code.dto.userDTO.UserCreateDTO;
-import hexlet.code.dto.userDTO.UserDTO;
-import hexlet.code.dto.userDTO.UserUpdateDTO;
-import hexlet.code.service.UserService;
+import hexlet.code.dto.user.UserCreateDTO;
+import hexlet.code.dto.user.UserDTO;
+import hexlet.code.dto.user.UserUpdateDTO;
+import hexlet.code.service.UsersService;
 
 import jakarta.validation.Valid;
 
@@ -23,19 +23,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
+public class UsersController {
 
     @Autowired
-    private UserService userService;
+    private UsersService userService;
 
     @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
     public List<UserDTO> index() {
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public UserDTO show(@PathVariable long id) {
         return userService.getById(id);
     }
@@ -47,7 +45,6 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@Valid @RequestBody UserUpdateDTO data, @PathVariable long id) {
         return userService.update(data, id);
     }
