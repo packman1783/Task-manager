@@ -1,22 +1,26 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.userDTO.UserCreateDTO;
-import hexlet.code.dto.userDTO.UserDTO;
-import hexlet.code.dto.userDTO.UserUpdateDTO;
+import hexlet.code.dto.user.UserCreateDTO;
+import hexlet.code.dto.user.UserDTO;
+import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
 @Service
-public class UserService {
+public class UsersService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserMapper userMapper;
@@ -36,6 +40,8 @@ public class UserService {
 
     public UserDTO create(UserCreateDTO data) {
         var user = userMapper.map(data);
+        var encryptedPassword = passwordEncoder.encode(data.getPassword());
+        user.setEncryptedPassword(encryptedPassword);
         userRepository.save(user);
         return userMapper.map(user);
     }
@@ -43,7 +49,14 @@ public class UserService {
     public UserDTO update(UserUpdateDTO data, long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+
         userMapper.update(data, user);
+
+        if (data.getPassword() != null) {
+            var hashedPassword = passwordEncoder.encode(user.getPassword());
+            user.setEncryptedPassword(hashedPassword);
+        }
+
         userRepository.save(user);
         return userMapper.map(user);
     }
