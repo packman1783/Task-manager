@@ -3,3 +3,12 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  output:
+    ansi:
+      enabled: always
+  profiles:
+    default: development
+
+rsa:
+  private-key: ${RSA_PRIVATE_KEY:classpath:certs/private.pem}
+  public-key: ${RSA_PUBLIC_KEY:classpath:certs/public.pem}
