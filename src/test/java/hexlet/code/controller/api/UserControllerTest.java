@@ -194,4 +194,64 @@ public class UserControllerTest {
 
         assertThat(userRepository.findById(id)).isEmpty();
     }
+
+    @Test
+    public void testIndexWithoutAuth() throws Exception {
+        var request = get("/api/users");
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testShowWithoutAuth() throws Exception {
+        var request = get("/api/users/{id}", testUser.getId());
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testCreateWithoutNames() throws Exception {
+        var createData = Map.of(
+                "email", faker.internet().emailAddress(),
+                "password", faker.internet().password(3, 20)
+        );
+
+        var request = post("/api/users")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(createData));
+
+        mockMvc.perform(request).andExpect(status().isCreated());
+
+        var user = userRepository.findByEmail(createData.get("email"))
+                .orElseThrow(() -> new ResourceNotFoundException("\ntestCreate() in UserControllerTest failed\n"));
+
+        assertThat(user.getFirstName()).isNull();
+        assertThat(user.getLastName()).isNull();
+        assertThat(user.getEncryptedPassword()).isNotEqualTo(createData.get("password"));
+    }
+
+    @Test
+    public void testCreateWithInvalidData() throws Exception {
+        var createData = Map.of(
+                "firstName", faker.name().firstName(),
+                "lastName", faker.name().lastName(),
+                "email", "not a valid email",
+                "password", "a"
+        );
+
+        var request = post("/api/users")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(createData));
+
+        mockMvc.perform(request).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testDeleteWithoutAuth() throws Exception {
+        var request = delete("/api/users/{id}", testUser.getId());
+        mockMvc.perform(request)
+                .andExpect(status().isUnauthorized());
+    }
 }
