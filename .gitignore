@@ -10,6 +10,11 @@ build/
 # Ignore logs
 **/logs/
 
+# Ignore Front module
+node_modules/
+package.json
+package-lock.json
+
 HELP.md
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
