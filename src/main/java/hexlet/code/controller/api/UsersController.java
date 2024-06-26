@@ -4,6 +4,7 @@ import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.dto.user.UserDTO;
 import hexlet.code.dto.user.UserUpdateDTO;
 import hexlet.code.service.UsersService;
+import hexlet.code.util.UserUtils;
 
 import jakarta.validation.Valid;
 
@@ -29,6 +30,9 @@ public class UsersController {
     @Autowired
     private UsersService userService;
 
+    @Autowired
+    private UserUtils userUtils;
+
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> index() {
         var users = userService.getAll();
@@ -39,6 +43,8 @@ public class UsersController {
 
     @GetMapping("/{id}")
     public UserDTO show(@PathVariable long id) {
+        userUtils.verifyCurrentUser(id);
+
         return userService.getById(id);
     }
 
@@ -50,12 +56,16 @@ public class UsersController {
 
     @PutMapping("/{id}")
     public UserDTO update(@Valid @RequestBody UserUpdateDTO data, @PathVariable long id) {
+        userUtils.verifyCurrentUser(id);
+
         return userService.update(data, id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
+        userUtils.verifyCurrentUser(id);
+
         userService.delete(id);
     }
 }
