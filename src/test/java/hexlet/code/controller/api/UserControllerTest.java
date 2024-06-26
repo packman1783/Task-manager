@@ -11,16 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import hexlet.code.dto.user.UserCreateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelUtils;
 
 import net.datafaker.Faker;
 
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 
@@ -51,28 +47,25 @@ public class UserControllerTest {
     private ObjectMapper om;
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private ModelUtils modelUtils;
 
     private JwtRequestPostProcessor token;
 
+    private JwtRequestPostProcessor anotherToken;
+
     private User testUser;
+
+    private User testAnotherUser;
 
     @BeforeEach
     public void setUp() {
-        token = jwt().jwt(builder -> builder.subject("hexlet@example.com"));
-        var hashedPassword = passwordEncoder.encode(faker.internet().password(3, 20));
-        var userData = Instancio.of(UserCreateDTO.class)
-                .supply(Select.field(UserCreateDTO::getFirstName), () -> faker.name().firstName())
-                .supply(Select.field(UserCreateDTO::getLastName), () -> faker.name().lastName())
-                .supply(Select.field(UserCreateDTO::getEmail), () -> faker.internet().emailAddress())
-                .supply(Select.field(UserCreateDTO::getPassword), () -> hashedPassword)
-                .create();
-        testUser = userMapper.map(userData);
+        testUser = modelUtils.generateData().getUser();
         userRepository.save(testUser);
+        token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
+        testAnotherUser = modelUtils.generateData().getUser();
+        userRepository.save(testAnotherUser);
+        anotherToken = jwt().jwt(builder -> builder.subject(testAnotherUser.getEmail()));
     }
 
     @AfterEach
@@ -190,23 +183,64 @@ public class UserControllerTest {
         assertThat(userRepository.findById(id)).isPresent();
 
         var request = delete("/api/users/{id}", id).with(token);
+
         mockMvc.perform(request).andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(id)).isEmpty();
     }
 
     @Test
+    public void testDeleteByAnotherUser() throws Exception {
+        var id = testUser.getId();
+
+        var request = delete("/api/users/{id}", id)
+                .with(anotherToken)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request).andExpect(status().isForbidden());
+
+        var user = userRepository.findById(id).orElse(null);
+
+        assertThat(user).isNotNull();
+    }
+
+    @Test
+    public void testUpdateByAnotherUser() throws Exception {
+        var id = testUser.getId();
+
+        var updateData = Map.of(
+                "email", faker.internet().emailAddress(),
+                "password", faker.internet().password(3, 20)
+        );
+
+        var request = put("/api/users/{id}", id)
+                .with(anotherToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(updateData));
+
+        mockMvc.perform(request).andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testIndexWithoutAuth() throws Exception {
         var request = get("/api/users");
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(request).andExpect(status().isUnauthorized());
     }
 
     @Test
     public void testShowWithoutAuth() throws Exception {
         var request = get("/api/users/{id}", testUser.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(request).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testDeleteWithoutAuth() throws Exception {
+        var id = testUser.getId();
+        var request = delete("/api/users/{id}", id);
+
+        mockMvc.perform(request).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -246,12 +280,5 @@ public class UserControllerTest {
                 .content(om.writeValueAsString(createData));
 
         mockMvc.perform(request).andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testDeleteWithoutAuth() throws Exception {
-        var request = delete("/api/users/{id}", testUser.getId());
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
     }
 }
