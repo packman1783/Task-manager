@@ -36,6 +36,7 @@ public class UsersController {
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> index() {
         var users = userService.getAll();
+
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(users.size()))
                 .body(users);
@@ -43,7 +44,6 @@ public class UsersController {
 
     @GetMapping("/{id}")
     public UserDTO show(@PathVariable long id) {
-        userUtils.verifyCurrentUser(id);
 
         return userService.getById(id);
     }
@@ -51,6 +51,7 @@ public class UsersController {
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO data) {
+
         return userService.create(data);
     }
 
