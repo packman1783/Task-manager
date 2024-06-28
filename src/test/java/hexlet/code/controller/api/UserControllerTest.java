@@ -230,7 +230,8 @@ public class UserControllerTest {
 
     @Test
     public void testShowWithoutAuth() throws Exception {
-        var request = get("/api/users/{id}", testUser.getId());
+        var id = testUser.getId();
+        var request = get("/api/users/{id}", id);
 
         mockMvc.perform(request).andExpect(status().isUnauthorized());
     }
