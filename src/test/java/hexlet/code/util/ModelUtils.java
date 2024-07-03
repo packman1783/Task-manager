@@ -1,7 +1,9 @@
 package hexlet.code.util;
 
+import hexlet.code.mapper.TaskMapper;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 
@@ -31,13 +33,19 @@ public class ModelUtils {
     @Autowired
     private TaskStatusMapper taskStatusMapper;
 
+    @Autowired
+    private TaskMapper taskMapper;
+
     private User user;
 
     private TaskStatus taskStatus;
 
+    private Task task;
+
     public ModelUtils generateData() {
         createUser();
         createTaskStatus();
+        createTask();
 
         return this;
     }
@@ -61,6 +69,17 @@ public class ModelUtils {
                 .supply(Select.field(TaskStatus::getName), () -> faker.lorem().word())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.lorem().word())
                 .ignore(Select.field(TaskStatus::getCreatedAt))
+                .create();
+    }
+
+    private void createTask() {
+        task = Instancio.of(Task.class)
+                .ignore(Select.field(Task::getId))
+                .supply(Select.field(Task::getName), () -> faker.lorem().word())
+                .supply(Select.field(Task::getIndex), () -> faker.number().numberBetween(1L, 10000L))
+                .supply(Select.field(Task::getDescription), () -> faker.lorem().paragraph())
+                .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
+                .supply(Select.field(Task::getAssignee), () -> user)
                 .create();
     }
 }
