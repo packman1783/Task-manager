@@ -1,7 +1,10 @@
 package hexlet.code.component;
 
+import hexlet.code.dto.label.LabelCreateDTO;
 import hexlet.code.dto.taskStatus.TaskStatusCreateDTO;
+import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.service.CustomUserDetailsService;
 import hexlet.code.mapper.TaskStatusMapper;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -31,6 +35,12 @@ public class DataInitializer implements ApplicationRunner {
 
     @Autowired
     private final TaskStatusMapper taskStatusMapper;
+
+    @Autowired
+    private final LabelRepository labelRepository;
+
+    @Autowired
+    private final LabelMapper labelMapper;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -60,5 +70,16 @@ public class DataInitializer implements ApplicationRunner {
             taskStatusRepository.save(taskStatus);
         }
 
+        var defaultLabels = List.of(
+                "feature",
+                "bug"
+        );
+        for (var labelName : defaultLabels) {
+            var labelCreateDTO = new LabelCreateDTO();
+            labelCreateDTO.setName(labelName);
+
+            var label = labelMapper.map(labelCreateDTO);
+            labelRepository.save(label);
+        }
     }
 }
