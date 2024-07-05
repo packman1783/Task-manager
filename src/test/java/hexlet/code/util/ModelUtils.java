@@ -1,19 +1,23 @@
 package hexlet.code.util;
 
+import hexlet.code.mapper.LabelMapper;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.mapper.UserMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 
 import net.datafaker.Faker;
 
-import org.instancio.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.instancio.Instancio;
+import org.instancio.Select;
+
+import java.util.HashSet;
 
 import lombok.Getter;
 
@@ -36,16 +40,22 @@ public class ModelUtils {
     @Autowired
     private TaskMapper taskMapper;
 
+    @Autowired
+    private LabelMapper labelMapper;
+
     private User user;
 
     private TaskStatus taskStatus;
 
     private Task task;
 
+    private Label label;
+
     public ModelUtils generateData() {
         createUser();
         createTaskStatus();
         createTask();
+        createLabel();
 
         return this;
     }
@@ -80,6 +90,18 @@ public class ModelUtils {
                 .supply(Select.field(Task::getDescription), () -> faker.lorem().paragraph())
                 .supply(Select.field(Task::getTaskStatus), () -> taskStatus)
                 .supply(Select.field(Task::getAssignee), () -> user)
+                .supply(Select.field(Task::getLabels), () -> new HashSet<Long>())
+                .create();
+
+        task.getLabels().add(label);
+    }
+
+    private void createLabel() {
+        label = Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .supply(Select.field(Label::getName), () -> faker.lorem().characters(3, 1000))
+                .ignore(Select.field(Label::getTasks))
+                .ignore(Select.field(Label::getCreatedAt))
                 .create();
     }
 }
