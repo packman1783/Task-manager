@@ -1,12 +1,12 @@
 package hexlet.code.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +21,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "tasks")
@@ -28,7 +29,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(onlyExplicitlyIncluded = true)
 public class Task implements BaseEntity {
 
     @Id
@@ -37,10 +37,9 @@ public class Task implements BaseEntity {
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
-    private long index;
+    private Long index;
 
     @ToString.Include
     private String description;
@@ -51,6 +50,9 @@ public class Task implements BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User assignee;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Label> labels;
 
     @CreatedDate
     private LocalDate createdAt;
