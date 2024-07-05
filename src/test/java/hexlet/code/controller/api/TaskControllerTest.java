@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.task.TaskCreateDTO;
 import hexlet.code.dto.task.TaskUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -25,6 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 
@@ -56,18 +61,20 @@ public class TaskControllerTest {
     private TaskRepository taskRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private Faker faker;
 
     @Autowired
     private ModelUtils modelUtils;
 
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
-
     private User testUser;
-
-    private TaskStatus testTaskStatus;
-
     private Task testTask;
+    private TaskStatus testTaskStatus;
+    private Label testLabel;
+    private Set<Label> testLabels;
 
     @BeforeEach
     public void setUp() {
@@ -80,9 +87,15 @@ public class TaskControllerTest {
         testTaskStatus = modelUtils.getTaskStatus();
         taskStatusRepository.save(testTaskStatus);
 
+        testLabel = modelUtils.getLabel();
+        labelRepository.save(testLabel);
+        testLabels = new HashSet<>();
+        testLabels.add(testLabel);
+
         testTask = modelUtils.getTask();
         testTask.setTaskStatus(testTaskStatus);
         testTask.setAssignee(testUser);
+        testTask.setLabels(testLabels);
         taskRepository.save(testTask);
     }
 
@@ -91,6 +104,7 @@ public class TaskControllerTest {
         taskRepository.deleteById(testTask.getId());
         userRepository.deleteById(testUser.getId());
         taskStatusRepository.deleteById(testTaskStatus.getId());
+        labelRepository.deleteById(testLabel.getId());
     }
 
     @Test
@@ -129,11 +143,22 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void testShowNotAuthenticated() throws Exception {
-        var request = get("/api/tasks/{id}", testTask.getId());
+    public void testShowWithInvalidId() throws Exception {
+        var id = testTask.getId();
+        taskRepository.deleteById(id);
 
-        mockMvc.perform(request)
-                .andExpect(status().isUnauthorized());
+        var request = get("/api/tasks/{id}", id)
+                .with(token);
+
+        var result = mockMvc.perform(request).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testShowNotAuthenticated() throws Exception {
+        var id = testTask.getId();
+        var request = get("/api/tasks/{id}", id);
+
+        mockMvc.perform(request).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -144,6 +169,7 @@ public class TaskControllerTest {
         createData.setTitle(faker.lorem().word());
         createData.setContent(faker.lorem().paragraph());
         createData.setStatus(testTaskStatus.getSlug());
+        createData.setTaskLabelIds(Set.of(testLabel.getId()));
 
         var request = post("/api/tasks")
                 .with(token)
@@ -155,7 +181,9 @@ public class TaskControllerTest {
                 .andReturn();
 
         var responseBody = result.getResponse().getContentAsString();
+
         Long id = om.readTree(responseBody).get("id").asLong();
+
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("\ntestCreate in TasksControllerTest failed\n"));
 
@@ -164,6 +192,7 @@ public class TaskControllerTest {
         assertThat(task.getDescription()).isEqualTo(createData.getContent());
         assertThat(task.getTaskStatus()).isEqualTo(testTaskStatus);
         assertThat(task.getAssignee()).isEqualTo(testUser);
+        assertThat(task.getLabels()).contains(testLabel);
 
         taskRepository.deleteById(id);
     }
@@ -185,7 +214,7 @@ public class TaskControllerTest {
 
         mockMvc.perform(request).andExpect(status().isOk());
 
-        var updatedTask = taskRepository.findById(id)
+        var updatedTask = taskRepository.findById(testTask.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("\ntestUpdate in TasksControllerTest failed\n"));
 
         assertThat(updatedTask.getIndex()).isEqualTo(updateData.getIndex().get());
@@ -194,6 +223,7 @@ public class TaskControllerTest {
         assertThat(updatedTask.getDescription()).isEqualTo(updateData.getContent().get());
         assertThat(updatedTask.getTaskStatus().getSlug()).isEqualTo(updateData.getStatus().get());
     }
+
 
     @Test
     public void testDelete() throws Exception {
