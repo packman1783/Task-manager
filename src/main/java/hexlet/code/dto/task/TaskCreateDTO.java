@@ -7,10 +7,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 public class TaskCreateDTO {
     private Long index;
+
     private String content;
 
     @JsonProperty("assignee_id")
@@ -21,4 +24,6 @@ public class TaskCreateDTO {
 
     @NotBlank
     private String status;
+
+    private Set<Long> taskLabelIds;
 }
