@@ -136,9 +136,7 @@ public class TaskControllerTest {
         for (var element : jsonNode) {
             assertThat(element.get("id").asLong()).isEqualTo(testTask.getId());
         }
-
     }
-
 
     @Test
     public void testIndex() throws Exception {
