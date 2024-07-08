@@ -16,16 +16,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 class AppApplicationTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@Test
-	public void testWelcome() throws Exception {
-		var result = mockMvc.perform(get("/welcome"))
-				.andExpect(status().isOk())
-				.andReturn();
+    @Test
+    public void testWelcome() throws Exception {
+        var result = mockMvc.perform(get("/welcome"))
+                .andExpect(status().isOk())
+                .andReturn();
 
-		var body = result.getResponse().getContentAsString();
-		assertThat(body).contains("Welcome to Spring");
-	}
+        var body = result.getResponse().getContentAsString();
+        assertThat(body).contains("Welcome to Spring");
+    }
 }
