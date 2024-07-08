@@ -108,6 +108,39 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void testIndexParams() throws Exception {
+        var titleContent = testTask.getName().substring(1).toLowerCase();
+        var assigneeId = testTask.getAssignee().getId();
+        var status = testTask.getTaskStatus().getSlug();
+        var labelId = testTask.getLabels().iterator().next().getId();
+
+        var mergeParam = "titleContent=" + titleContent
+                + "&assigneeId=" + assigneeId
+                + "&status=" + status
+                + "&labelId=" + labelId;
+
+        var path = "/api/tasks?" + mergeParam;
+
+        var request = get(path).with(token);
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).isArray().isNotEmpty();
+
+        var jsonNode = om.readTree(body);
+
+        for (var element : jsonNode) {
+            assertThat(element.get("id").asLong()).isEqualTo(testTask.getId());
+        }
+
+    }
+
+
+    @Test
     public void testIndex() throws Exception {
         var request = get("/api/tasks")
                 .with(token);
