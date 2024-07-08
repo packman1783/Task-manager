@@ -28,6 +28,4 @@ class AppApplicationTests {
 		var body = result.getResponse().getContentAsString();
 		assertThat(body).contains("Welcome to Spring");
 	}
-
 }
-
