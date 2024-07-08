@@ -16,10 +16,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v3
 
-      - run: gradle test
+      - run: make lint
+      - run: make test
 
       - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v3.0.0
+        uses: paambaati/codeclimate-action@v3.1.1
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
           JACOCO_SOURCE_PATH: src/main/java
