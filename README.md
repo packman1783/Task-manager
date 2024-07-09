@@ -3,6 +3,34 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/72f7dcc9e0da19114a27/maintainability)](https://codeclimate.com/github/packman1783/java-project-99/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/72f7dcc9e0da19114a27/test_coverage)](https://codeclimate.com/github/packman1783/java-project-99/test_coverage)
 
-https://java-project-99-7ogs.onrender.com
+## Description:
+Task Manager is a small web application based on Spring Boot framework, it allows you:
+ - set tasks
+ - assign executors
+ - change their statuses
 
-http://localhost:8080/swagger-ui/index.html
+Here we practice the basic principles of building application:
+ - creation of entities using ORM and description of relations between them (o2m, m2m)
+ - use of resource routing, which allows to unify work with typical CRUD operations
+ - registration and authentication mechanism
+ - data filtration
+
+You can familiarise yourself with the possibilities of the application here on Render.com [task-manager](https://java-project-99-7ogs.onrender.com)
+
+## Use:
+for example:
+```
+gradle bootRun
+```
+
+By default, the server starts at http://localhost:8080, after you can use default
+
+Username: hexlet@example.com
+
+Password: qwerty
+
+![task-manager](https://i.ibb.co/tXb0bfw/task-manager-copy.png)
+
+You will find the administration dashboard and can explore all available options such as users, tasks, task statuses and labels
+
+You can also get documentation using the Swagger resource with link http://localhost:8080/swagger-ui/index.html
