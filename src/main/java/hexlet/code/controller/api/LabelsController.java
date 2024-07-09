@@ -29,7 +29,7 @@ public class LabelsController {
     @Autowired
     private LabelService labelService;
 
-    @GetMapping(path = "")
+    @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<LabelDTO>> index() {
         var result = labelService.getAll();
@@ -38,25 +38,25 @@ public class LabelsController {
                 .body(result);
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelDTO show(@PathVariable Long id) {
         return labelService.findById(id);
     }
 
-    @PostMapping(path = "")
+    @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public LabelDTO create(@Valid @RequestBody LabelCreateDTO dto) {
         return labelService.create(dto);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public LabelDTO update(@PathVariable Long id, @Valid @RequestBody LabelUpdateDTO dto) {
         return labelService.update(id, dto);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void destroy(@PathVariable Long id) {
         labelService.delete(id);

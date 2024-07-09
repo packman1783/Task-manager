@@ -44,20 +44,17 @@ public class TaskStatusesController {
 
     @GetMapping("/{id}")
     public TaskStatusDTO show(@PathVariable Long id) {
-
         return taskStatusService.getById(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public TaskStatusDTO create(@Valid @RequestBody TaskStatusCreateDTO data) {
-
         return taskStatusService.create(data);
     }
 
     @PutMapping("/{id}")
     public TaskStatusDTO update(@Valid @RequestBody TaskStatusUpdateDTO data, @PathVariable Long id) {
-
         return taskStatusService.update(data, id);
     }
 

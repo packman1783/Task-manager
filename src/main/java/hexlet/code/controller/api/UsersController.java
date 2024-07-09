@@ -44,21 +44,18 @@ public class UsersController {
 
     @GetMapping("/{id}")
     public UserDTO show(@PathVariable long id) {
-
         return userService.getById(id);
     }
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO create(@Valid @RequestBody UserCreateDTO data) {
-
         return userService.create(data);
     }
 
     @PutMapping("/{id}")
     public UserDTO update(@Valid @RequestBody UserUpdateDTO data, @PathVariable long id) {
         userUtils.verifyCurrentUser(id);
-
         return userService.update(data, id);
     }
 
@@ -66,7 +63,6 @@ public class UsersController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
         userUtils.verifyCurrentUser(id);
-
         userService.delete(id);
     }
 }

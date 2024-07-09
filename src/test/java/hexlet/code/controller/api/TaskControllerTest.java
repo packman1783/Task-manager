@@ -108,6 +108,20 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void testIndex() throws Exception {
+        var request = get("/api/tasks")
+                .with(token);
+
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var body = result.getResponse().getContentAsString();
+
+        assertThatJson(body).isArray();
+    }
+
+    @Test
     public void testIndexParams() throws Exception {
         var titleContent = testTask.getName().substring(1).toLowerCase();
         var assigneeId = testTask.getAssignee().getId();
@@ -136,20 +150,6 @@ public class TaskControllerTest {
         for (var element : jsonNode) {
             assertThat(element.get("id").asLong()).isEqualTo(testTask.getId());
         }
-    }
-
-    @Test
-    public void testIndex() throws Exception {
-        var request = get("/api/tasks")
-                .with(token);
-
-        var result = mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        var body = result.getResponse().getContentAsString();
-
-        assertThatJson(body).isArray();
     }
 
     @Test

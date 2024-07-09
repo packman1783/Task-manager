@@ -54,8 +54,8 @@ public class ModelUtils {
     public ModelUtils generateData() {
         createUser();
         createTaskStatus();
-        createTask();
         createLabel();
+        createTask();
 
         return this;
     }
@@ -79,6 +79,17 @@ public class ModelUtils {
                 .supply(Select.field(TaskStatus::getName), () -> faker.lorem().word())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.lorem().word())
                 .ignore(Select.field(TaskStatus::getCreatedAt))
+                .ignore(Select.field(TaskStatus::getTasks))
+                .create();
+    }
+
+
+    private void createLabel() {
+        label = Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .supply(Select.field(Label::getName), () -> faker.lorem().characters(3, 1000))
+                .ignore(Select.field(Label::getTasks))
+                .ignore(Select.field(Label::getCreatedAt))
                 .create();
     }
 
@@ -94,14 +105,5 @@ public class ModelUtils {
                 .create();
 
         task.getLabels().add(label);
-    }
-
-    private void createLabel() {
-        label = Instancio.of(Label.class)
-                .ignore(Select.field(Label::getId))
-                .supply(Select.field(Label::getName), () -> faker.lorem().characters(3, 1000))
-                .ignore(Select.field(Label::getTasks))
-                .ignore(Select.field(Label::getCreatedAt))
-                .create();
     }
 }

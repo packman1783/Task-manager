@@ -85,6 +85,23 @@ public class UserControllerTest {
     }
 
     @Test
+    public void testShow() throws Exception {
+        var id = testUser.getId();
+        var request = get("/api/users/{id}", id).with(token);
+        var result = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var responseBody = result.getResponse().getContentAsString();
+
+        assertThatJson(responseBody).and(
+                body -> body.node("firstName").isEqualTo(testUser.getFirstName()),
+                body -> body.node("lastName").isEqualTo(testUser.getLastName()),
+                body -> body.node("email").isEqualTo(testUser.getEmail())
+        );
+    }
+
+    @Test
     public void testCreate() throws Exception {
         var createData = Map.of(
                 "firstName", faker.name().firstName(),
@@ -106,23 +123,6 @@ public class UserControllerTest {
         assertThat(user.getFirstName()).isEqualTo(createData.get("firstName"));
         assertThat(user.getLastName()).isEqualTo(createData.get("lastName"));
         assertThat(user.getEncryptedPassword()).isNotEqualTo(createData.get("password"));
-    }
-
-    @Test
-    public void testShow() throws Exception {
-        var id = testUser.getId();
-        var request = get("/api/users/{id}", id).with(token);
-        var result = mockMvc.perform(request)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        var responseBody = result.getResponse().getContentAsString();
-
-        assertThatJson(responseBody).and(
-                body -> body.node("firstName").isEqualTo(testUser.getFirstName()),
-                body -> body.node("lastName").isEqualTo(testUser.getLastName()),
-                body -> body.node("email").isEqualTo(testUser.getEmail())
-        );
     }
 
     @Test
