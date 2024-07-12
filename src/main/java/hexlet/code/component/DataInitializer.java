@@ -10,7 +10,6 @@ import hexlet.code.service.CustomUserDetailsService;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -24,22 +23,16 @@ import java.util.Map;
 @AllArgsConstructor
 public class DataInitializer implements ApplicationRunner {
 
-    @Autowired
     private final UserRepository userRepository;
 
-    @Autowired
     private final CustomUserDetailsService userService;
 
-    @Autowired
     private final TaskStatusRepository taskStatusRepository;
 
-    @Autowired
     private final TaskStatusMapper taskStatusMapper;
 
-    @Autowired
     private final LabelRepository labelRepository;
 
-    @Autowired
     private final LabelMapper labelMapper;
 
     @Override

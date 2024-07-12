@@ -18,16 +18,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/labels")
+@AllArgsConstructor
 public class LabelsController {
 
-    @Autowired
-    private LabelService labelService;
+    private final LabelService labelService;
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)

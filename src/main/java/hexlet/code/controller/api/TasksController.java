@@ -8,7 +8,6 @@ import hexlet.code.service.TasksService;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/tasks")
+@AllArgsConstructor
 public class TasksController {
 
-    @Autowired
-    private TasksService tasksService;
+    private final TasksService tasksService;
 
     @GetMapping("")
     public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params) {

@@ -8,7 +8,6 @@ import hexlet.code.util.UserUtils;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,15 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/api/users")
+@AllArgsConstructor
 public class UsersController {
 
-    @Autowired
-    private UsersService userService;
+    private final UsersService userService;
 
-    @Autowired
-    private UserUtils userUtils;
+    private final UserUtils userUtils;
 
     @GetMapping("")
     public ResponseEntity<List<UserDTO>> index() {
