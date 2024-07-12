@@ -8,6 +8,11 @@ spring:
       enabled: always
   profiles:
     default: development
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 rsa:
   private-key: ${RSA_PRIVATE_KEY:classpath:certs/private.pem}
