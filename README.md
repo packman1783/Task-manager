@@ -29,8 +29,12 @@ Username: hexlet@example.com
 
 Password: qwerty
 
-![task-manager](https://i.ibb.co/tXb0bfw/task-manager-copy.png)
+*Server Communication Error* appears when the JWT token has expired, you need to logout and log in again.
+
+![task-manager](https://i.ibb.co/ch98kqQ/task-manager.jpg)
 
 You will find the administration dashboard and can explore all available options such as users, tasks, task statuses and labels
+
+![task-manager dashboard](https://i.ibb.co/P6rDHN7/task-manager-dashboard.jpg)
 
 You can also get documentation using the Swagger resource with link http://localhost:8080/swagger-ui/index.html
